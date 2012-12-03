@@ -50,7 +50,7 @@ module Grape
       end
 
       def response
-        Rack::Response.new(@app_response)
+        Rack::Response.new(@app_response) if @app_response
       end
 
       def content_types
