@@ -24,6 +24,10 @@ describe Grape::Middleware::Base do
         @start = Time.now
         result = yield
         @stop = Time.now
+        if (request)
+          [200, {}, 'Stop. Hammer time.']
+        end
+        result
       end
       
       def call(env)
@@ -32,9 +36,12 @@ describe Grape::Middleware::Base do
         end
       end
     end
+    subject = Class.new(Grape::API)
     subject.use BenchmarkWare
-    subject.call({})
-    subject.request.should be_kind_of(Rack::Request)
+    expect { subject }.to_not raise_error
+    #subject.call({})
+    subject.get '/'
+    #subject.request.should be_kind_of(Rack::Request)
   end
   
   it 'should call through to the app' do
