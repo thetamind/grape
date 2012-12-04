@@ -18,6 +18,25 @@ describe Grape::Middleware::Base do
     subject.request.should be_kind_of(Rack::Request)
   end
   
+  it 'should be able to access the request through middleware' do
+    class BenchmarkWare < Grape::Middleware::Base
+      def instrument
+        @start = Time.now
+        result = yield
+        @stop = Time.now
+      end
+      
+      def call(env)
+        instrument do
+          super
+        end
+      end
+    end
+    subject.use BenchmarkWare
+    subject.call({})
+    subject.request.should be_kind_of(Rack::Request)
+  end
+  
   it 'should call through to the app' do
     subject.call({}).should == [200, {}, 'Hi there.']
   end
